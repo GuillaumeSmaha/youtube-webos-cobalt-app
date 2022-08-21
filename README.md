@@ -1,15 +1,26 @@
-# youtube-webos
+# youtube-webos-cobalt
 
-YouTube App with extended functionalities
+YouTube App built with [Cobalt](https://cobalt.googlesource.com/cobalt/) with extended functionalities.
 
-![Configuration Screen](https://github.com/webosbrew/youtube-webos/blob/main/screenshots/1_sm.jpg?raw=true)
-![Segment Skipped](https://github.com/webosbrew/youtube-webos/blob/main/screenshots/2_sm.jpg?raw=true)
+This project is built on top of [youtube-webos](https://github.com/webosbrew/youtube-webos).
+
+Cobalt [only support a subset of HTML tags](https://cobalt.dev/development/reference/supported-features.html),
+youtube-webos had to be reworked to only use `div` tag.
+
+![Configuration Screen](./screenshots/1_sm.jpg)
+![Segment Skipped](./screenshots/2_sm.jpg)
+![Spped Configuration](./screenshots/3_sm.jpg)
 
 ## Features
 
+Same as the default youtube application:
+- Speed management
+
+Same as youtube-webos:
 - Advertisements blocking
 - [SponsorBlock](https://sponsor.ajay.app/) integration
 - [Autostart](#autostart)
+
 
 **Note:** Configuration screen can be opened by pressing 🟩 GREEN button on the remote.
 
@@ -57,13 +68,13 @@ luna-send -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.le
 - Clone the repository
 
 ```sh
-git clone https://github.com/FriedChickenButt/youtube-webos.git
+git clone https://github.com/GuillaumeSmaha/youtube-webos-cobalt.git
 ```
 
 - Enter the folder and build the App, this will generate a `*.ipk` file.
 
 ```sh
-cd youtube-webos
+cd youtube-webos-cobalt
 
 # Install dependencies (need to do this only when updating local repository / package.json is changed)
 npm install
