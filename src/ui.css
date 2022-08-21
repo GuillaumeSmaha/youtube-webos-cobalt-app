@@ -1,3 +1,4 @@
+/* Global */
 .ytaf-ui-container {
   position: absolute;
   top: 10%;
@@ -5,40 +6,47 @@
   right: 10%;
   bottom: 10%;
 
-  background: rgba(0, 0, 0, 0.8);
+  /* background: rgba(0, 0, 0, 0.8); */
+  background: rgb(0, 0, 0);
   color: white;
   border-radius: 20px;
   padding: 20px;
   font-size: 1.5rem;
-  z-index: 1000;
+  z-index: 10000;
+  display: none;
 }
 
 .ytaf-ui-container :focus {
-  outline: 4px red solid;
+  outline: 0;
 }
 
-.ytaf-ui-container h1 {
-  margin: 0;
-  margin-bottom: 0.5em;
+.ytaf-ui-container div.center {
   text-align: center;
 }
 
-.ytaf-ui-container input[type='checkbox'] {
-  width: 2rem;
-  height: 1.5rem;
+.ytaf-ui-container div.small {
+  font-size: 1rem;
 }
 
-.ytaf-ui-container label {
-  display: block;
-  font-size: 2rem;
+.ytaf-ui-container div.center h1 {
+  margin: 0;
+  margin-bottom: 0.5em;
+  text-align: center;
+  font-size: 3rem;
 }
+
+.ytaf-ui-container div.blockquote {
+  padding-left: 50px;
+}
+
+/* Notification */
 
 .ytaf-notification-container {
   position: absolute;
   right: 10px;
   bottom: 10px;
-  font-size: 16pt;
-  z-index: 1200;
+  font-size: 2em;
+  z-index: 12000;
 }
 
 .ytaf-notification-container .message {
@@ -51,7 +59,6 @@
   line-height: 1;
   border-right: 10px solid rgba(50, 255, 50, 0.3);
   display: inline-block;
-  float: right;
 }
 
 .ytaf-notification-container .message-hidden {

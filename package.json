@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
+    "watch": "webpack --watch",
     "package": "ares-package -n dist",
     "deploy": "node tools/deploy.mjs",
     "launch": "ares-launch youtube.leanback.v4",
     "manifest": "node tools/gen-manifest.js youtube.leanback.v4.manifest.json",
     "version": "node tools/sync-version.js && git add assets/appinfo.json",
-    "prepare": "husky install"
+    "prepare": "cd .. && husky install"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   "homepage": "https://github.com/webosbrew/youtube-webos#readme",
   "dependencies": {
     "@babel/runtime": "^7.16.7",
+    "@webcomponents/webcomponentsjs": "^2.6.0",
     "core-js-pure": "^3.20.2",
     "regenerator-runtime": "^0.13.9",
     "tiny-sha256": "^1.0.2",
@@ -41,8 +43,12 @@
     "css-loader": "^6.5.1",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.3.0",
+    "html-inline-css-webpack-plugin": "^1.11.1",
+    "html-loader": "^4.1.0",
+    "html-webpack-plugin": "^5.5.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.1.7",
+    "mini-css-extract-plugin": "^2.6.1",
     "prettier": "^2.5.1",
     "style-loader": "^3.3.1",
     "webpack": "^5.65.0",

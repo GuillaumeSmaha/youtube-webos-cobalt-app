@@ -1,6 +1,8 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
 module.exports = (env) => [
   {
     mode: env.production ? 'production' : 'development',
@@ -11,16 +13,18 @@ module.exports = (env) => [
     // which seem to cause segfaults (at least) on nodeJS v0.12.2 used on webOS 3.x.
     // This feature makes sense only when using recent enough chrome-based
     // node inspector anyway.
-    devtool: 'source-map',
+    devtool: env.production ? false : 'source-map',
+
+    optimization: {
+      minimize: env.production ? true : false,
+    },
 
     entry: {
       index: './src/index.js',
-      userScript: './src/userScript.js'
+      adblockMain: './src/adblock-main.js'
     },
     output: {
-      path: path.resolve(__dirname, './dist'),
-      filename: ({ chunk: { name } }) =>
-        name === 'userScript' ? 'webOSUserScripts/[name].js' : '[name].js'
+      path: path.resolve(__dirname, '../cobalt/cobalt/adblock/content')
     },
     resolve: {
       extensions: ['.ts', '.js']
@@ -44,16 +48,18 @@ module.exports = (env) => [
         {
           test: /\.css$/i,
           use: [
-            { loader: 'style-loader' },
+            MiniCssExtractPlugin.loader,
             { loader: 'css-loader', options: { esModule: false } }
           ]
         }
       ]
     },
     plugins: [
+      new MiniCssExtractPlugin({
+        chunkFilename: '[id].css'
+      }),
       new CopyPlugin({
         patterns: [
-          { context: 'assets', from: '**/*' },
           { context: 'src', from: 'index.html' }
         ]
       })

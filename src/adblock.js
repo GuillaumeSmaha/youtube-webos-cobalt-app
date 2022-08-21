@@ -2,6 +2,8 @@
 /* global fetch:writable */
 import { configRead } from './config';
 
+export function userScriptStartAdBlock() {}
+
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
  * https://github.com/uBlockOrigin/uAssets/blob/3497eebd440f4871830b9b45af0afc406c6eb593/filters/filters.txt#L116
@@ -15,6 +17,7 @@ const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
   if (r.adPlacements && configRead('enableAdBlock')) {
+    console.log('Adblock Removed !');
     r.adPlacements = [];
   }
 
@@ -24,6 +27,7 @@ JSON.parse = function () {
       ?.sectionListRenderer?.contents &&
     configRead('enableAdBlock')
   ) {
+    console.log('Adblock Removed (2) !');
     r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
       r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
         (elm) => !elm.tvMastheadRenderer
