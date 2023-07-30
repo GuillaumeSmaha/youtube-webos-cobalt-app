@@ -65,22 +65,38 @@ luna-send -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.le
 
 ## Building
 
+- Install docker:
+
+Follow instructions on https://docs.docker.com/engine/install/
+
+- Install tools
+
+```sh
+sudo apt install jq git patch
+```
+
+
 - Clone the repository
 
 ```sh
 git clone https://github.com/GuillaumeSmaha/youtube-webos-cobalt.git
 ```
 
-- Enter the folder and build the App, this will generate a `*.ipk` file.
+- Enter the folder and build the App, this will generate a `*.ipk` file in `output` directory.
 
 ```sh
 cd youtube-webos-cobalt
 
-# Install dependencies (need to do this only when updating local repository / package.json is changed)
-npm install
-
-npm run build && npm run package
+make
 ```
+
+Customize package name:
+`PACKAGE_NAME` can be updated to change the package name
+```sh
+make PACKAGE_NAME=youtube-free.leanback.v4
+```
+
+
 
 ## Development TV setup
 
@@ -109,11 +125,12 @@ ares-setup-device -a webos -i "username=prisoner" -i "privatekey=/path/to/downlo
 ares-setup-device -a webos -i "username=root" -i "privatekey=/path/to/id_rsa" -i "passphrase=SSH_KEY_PASSPHRASE" -i "host=TV_IP" -i "port=22"
 ```
 
-**Note:** @webosose/ares-cli doesn't need to be installed globally - you can use a package installed locally after `npm install` in this repo by just prefixing above commands with local path, like so: `node_modules/.bin/ares-setup-device ...`
+**Note:** @webosose/ares-cli doesn't need to be installed globally - you can use a package installed locally after `cd youtube-webos && npm install` in this repo by just prefixing above commands with local path, like so: `node_modules/.bin/ares-setup-device ...`
 
 ## Installation
 
 ```
+cd youtube-webos
 npm run deploy
 ```
 
@@ -122,11 +139,13 @@ npm run deploy
 - The app will be available in the TV's app list or launch it using ares-cli.
 
 ```sh
+cd youtube-webos
 npm run launch
 ```
 
 To jump immediately into some specific video use:
 
 ```sh
+cd youtube-webos
 npm run launch -- -p '{"contentTarget":"v=F8PGWLvn1mQ"}'
 ```
