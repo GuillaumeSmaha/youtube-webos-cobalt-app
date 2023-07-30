@@ -6,7 +6,7 @@ COBALT_TARGET?=cobalt
 PACKAGE_NAME?=
 PACKAGE_NAME_OFFICIAL=youtube.leanback.v4
 PACKAGE_NAME_END=$(if $(PACKAGE_NAME),$(PACKAGE_NAME),$(PACKAGE_NAME_OFFICIAL))
-YOUTUBE_IPK?=ipks/2022-12-01-youtube.leanback.v4.ipk
+YOUTUBE_IPK?=ipks/2023-07-30-youtube.leanback.v4.ipk
 
 SHELL?=/bin/bash
 
