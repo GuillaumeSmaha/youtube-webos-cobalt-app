@@ -8,8 +8,6 @@ PACKAGE_NAME_OFFICIAL=youtube.leanback.v4
 PACKAGE_NAME_END=$(if $(PACKAGE_NAME),$(PACKAGE_NAME),$(PACKAGE_NAME_OFFICIAL))
 YOUTUBE_IPK?=ipks/2022-12-01-youtube.leanback.v4.ipk
 
-_IPK_OFFICIAL_SB_VERSION=$(shell strings ipk/image/usr/palm/applications/$(PACKAGE_NAME_OFFICIAL)/cobalt | grep sb_api | jq -r '.sb_api_version')
-
 SHELL?=/bin/bash
 
 .PHONY: all
@@ -64,10 +62,11 @@ ipk-unpack: clean-ipk
 	tar xvzpf ipk/unpacked_ipk/control.tar.gz -C ipk/unpacked_ipk
 	tar xvzpf ipk/unpacked_ipk/data.tar.gz -C ipk/package
 	unsquashfs -f -d ipk/image ipk/package/usr/palm/data/images/$(PACKAGE_NAME_OFFICIAL)/data.img
-	if [ $(COBALT_SB_API_VERSION) -ne $(_IPK_OFFICIAL_SB_VERSION) ]; then \
+	ipkOfficialVersion=$$(strings ipk/image/usr/palm/applications/$(PACKAGE_NAME_OFFICIAL)/cobalt | grep sb_api | jq -r '.sb_api_version'); \
+	if [ "$(COBALT_SB_API_VERSION)" != "$$ipkOfficialVersion" ]; then \
 		echo "Incompatible SB API version:"; \
 		echo "  Current build is using "$(COBALT_SB_API_VERSION); \
-		echo "  Official IPK package is using "$(_IPK_OFFICIAL_SB_VERSION); \
+		echo "  Official IPK package is using "$$ipkOfficialVersion; \
 		exit 1; \
 	fi
 
