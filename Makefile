@@ -87,7 +87,7 @@ endif
 	cp assets/imageForRecents.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.imageForRecents' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
 	cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/content/app/cobalt/lib/libcobalt.so
 	cp -r cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/content/web/adblock/ ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/content/app/cobalt/content/web/
-	echo "--disable_updater_module" >> ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/switches
+	echo " --evergreen_lite" >> ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/switches
 
 .PHONY: package
 package: ipk-update
