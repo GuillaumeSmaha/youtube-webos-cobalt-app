@@ -15,7 +15,7 @@ all: ipk-unpack cobalt-build package
 	@echo ""
 
 .PHONY: cobalt
-cobalt: npm python cobalt-build
+cobalt: npm cobalt-build
 	@echo ""
 
 .PHONY: cobalt-clean
