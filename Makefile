@@ -85,7 +85,12 @@ endif
 	cp assets/extraLargeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.extraLargeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
 	cp assets/playIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.playIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
 	cp assets/imageForRecents.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.imageForRecents' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
-	cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/content/app/cobalt/lib/libcobalt.so
+	if [ -f cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ]; then \
+		cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/content/app/cobalt/lib/libcobalt.so; \
+	fi
+	if [ -f cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/libcobalt.so ]; then \
+		cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/content/app/cobalt/lib/libcobalt.so; \
+	fi
 	cp -r cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/content/web/adblock/ ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/content/app/cobalt/content/web/
 	echo " --evergreen_lite" >> ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/switches
 

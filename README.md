@@ -96,7 +96,20 @@ Customize package name:
 make PACKAGE_NAME=youtube-free.leanback.v4
 ```
 
+### Building issue
 
+If you already built the package, update the repo and got an error like `node-gyp not found`:
+
+Try to clean docker image used to build.
+```sh
+docker image rm cobalt-build-evergreen cobalt-build-linux cobalt-build-base cobalt-base
+```
+
+Try to clean old Cobalt builds:
+```sh
+rm -fr cobalt/out/
+make cobalt-clean
+```
 
 ## Development TV setup
 
