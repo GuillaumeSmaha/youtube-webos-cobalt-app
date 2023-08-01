@@ -5,8 +5,8 @@ COBALT_TARGET?=cobalt
 
 PACKAGE_NAME?=
 PACKAGE_NAME_OFFICIAL=youtube.leanback.v4
-PACKAGE_NAME_END=$(if $(PACKAGE_NAME),$(PACKAGE_NAME),$(PACKAGE_NAME_OFFICIAL))
-YOUTUBE_IPK?=ipks/2023-07-30-youtube.leanback.v4.ipk
+PACKAGE_NAME_TARGET=$(if $(PACKAGE_NAME),$(PACKAGE_NAME),$(PACKAGE_NAME_OFFICIAL))
+OFFICAL_YOUTUBE_IPK?=ipks-official/2023-07-30-youtube.leanback.v4.ipk
 
 SHELL?=/bin/bash
 
@@ -58,7 +58,7 @@ clean-ipk:
 .PHONY: ipk-unpack
 ipk-unpack: clean-ipk
 	mkdir -p ipk/unpacked_ipk ipk/package ipk/image
-	ar x --output ipk/unpacked_ipk $(YOUTUBE_IPK)
+	ar x --output ipk/unpacked_ipk $(OFFICAL_YOUTUBE_IPK)
 	tar xvzpf ipk/unpacked_ipk/control.tar.gz -C ipk/unpacked_ipk
 	tar xvzpf ipk/unpacked_ipk/data.tar.gz -C ipk/package
 	unsquashfs -f -d ipk/image ipk/package/usr/palm/data/images/$(PACKAGE_NAME_OFFICIAL)/data.img
@@ -72,34 +72,34 @@ ipk-unpack: clean-ipk
 
 .PHONY: ipk-update
 ipk-update:
-ifneq ("$(PACKAGE_NAME_END)","$(PACKAGE_NAME_OFFICIAL)")
-	find ipk -type d -name 'youtube.leanback.v4' | xargs -n1 rename "s/$(PACKAGE_NAME_OFFICIAL)/$(PACKAGE_NAME_END)/"
-	grep -l -R "youtube.leanback.v4" ipk | grep .json | xargs -n 1 sed -i "s/$(PACKAGE_NAME_OFFICIAL)/$(PACKAGE_NAME_END)/g"
+ifneq ("$(PACKAGE_NAME_TARGET)","$(PACKAGE_NAME_OFFICIAL)")
+	find ipk -type d -name 'youtube.leanback.v4' | xargs -n1 rename "s/$(PACKAGE_NAME_OFFICIAL)/$(PACKAGE_NAME_TARGET)/"
+	grep -l -R "youtube.leanback.v4" ipk | grep .json | xargs -n 1 sed -i "s/$(PACKAGE_NAME_OFFICIAL)/$(PACKAGE_NAME_TARGET)/g"
 endif
-	sed -i 's/YouTube/YouTube Cobalt AdBlock/g' ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json
-	jq 'del(.fileSystemType)' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json >  ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo2.json
-	mv ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo2.json ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json
-	cp assets/icon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.icon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
-	cp assets/mediumLargeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.mediumLargeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
-	cp assets/largeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.largeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
-	cp assets/extraLargeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.extraLargeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
-	cp assets/playIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.playIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
-	cp assets/imageForRecents.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/$$(jq -r '.imageForRecents' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/appinfo.json)
+	sed -i 's/YouTube/YouTube Cobalt AdBlock/g' ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json
+	jq 'del(.fileSystemType)' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json >  ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo2.json
+	mv ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo2.json ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json
+	cp assets/icon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.icon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/mediumLargeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.mediumLargeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/largeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.largeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/extraLargeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.extraLargeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/playIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.playIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/imageForRecents.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.imageForRecents' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
 	if [ -f cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ]; then \
-		cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/content/app/cobalt/lib/libcobalt.so; \
+		cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
 	fi
 	if [ -f cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/libcobalt.so ]; then \
-		cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/content/app/cobalt/lib/libcobalt.so; \
+		cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
 	fi
-	cp -r cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/content/web/adblock/ ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/content/app/cobalt/content/web/
-	echo " --evergreen_lite" >> ipk/image/usr/palm/applications/$(PACKAGE_NAME_END)/switches
+	cp -r cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/content/web/adblock/ ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/content/web/
+	echo " --evergreen_lite" >> ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/switches
 
 .PHONY: package
 package: ipk-update
-	cp -r ipk/image/usr/palm/applications/$(PACKAGE_NAME_END) ipk/package/usr/palm/applications
+	cp -r ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET) ipk/package/usr/palm/applications
 	rm -fr ipk/package/usr/palm/data
-	rm -f ipk/package/usr/palm/applications/$(PACKAGE_NAME_END)/drm.nfz
-	cp -r ipk/package/usr/palm/applications/$(PACKAGE_NAME_END) ipk/ipk
+	rm -f ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/drm.nfz
+	cp -r ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET) ipk/ipk
 	ares-package -v -c ipk/ipk
 	ares-package -v --outdir ./output ipk/ipk
 	echo "Package can be installed with:"
