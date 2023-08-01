@@ -82,11 +82,15 @@ sudo apt install jq git patch binutils
 git clone https://github.com/GuillaumeSmaha/youtube-webos-cobalt.git
 ```
 
-- Enter the folder and build the App, this will generate a `*.ipk` file in `output` directory.
-
+- Enter the folder and get git submodule:
 ```sh
 cd youtube-webos-cobalt
 
+git submodule update --init
+```
+
+- From the same location, build the App, this will generate a `*.ipk` file in `output` directory
+```sh
 make
 ```
 
