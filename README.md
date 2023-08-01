@@ -72,7 +72,7 @@ Follow instructions on https://docs.docker.com/engine/install/
 - Install tools
 
 ```sh
-sudo apt install jq git patch
+sudo apt install jq git patch binutils
 ```
 
 
