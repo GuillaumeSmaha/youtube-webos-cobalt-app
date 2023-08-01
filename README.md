@@ -69,6 +69,8 @@ luna-send -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.le
 
 Follow instructions on https://docs.docker.com/engine/install/
 
+Make sure to install all docker components like `docker-buildx-plugin` and ` docker-compose-plugin`.
+
 - Install tools
 
 ```sh
