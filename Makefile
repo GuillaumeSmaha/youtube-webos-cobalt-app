@@ -8,7 +8,7 @@ COBALT_PARALLEL?=
 PACKAGE_NAME?=
 PACKAGE_NAME_OFFICIAL=youtube.leanback.v4
 PACKAGE_NAME_TARGET=$(if $(PACKAGE_NAME),$(PACKAGE_NAME),$(PACKAGE_NAME_OFFICIAL))
-OFFICAL_YOUTUBE_IPK?=ipks-official/2023-07-30-youtube.leanback.v4.ipk
+OFFICAL_YOUTUBE_IPK?=ipks-official/2023-07-30-youtube.leanback.v4-1.1.7.ipk
 
 SHELL=/bin/bash
 
