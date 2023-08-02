@@ -74,7 +74,7 @@ Make sure to install all docker components like `docker-buildx-plugin` and ` doc
 - Install tools
 
 ```sh
-sudo apt install jq git patch binutils
+sudo apt install jq git patch binutils squashfs-tools
 ```
 
 
