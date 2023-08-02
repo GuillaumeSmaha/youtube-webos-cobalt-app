@@ -3,6 +3,7 @@ COBALT_SB_API_VERSION?=12
 COBALT_ARCHITECTURE?=arm-softfp
 COBALT_PLATFORM?=evergreen-$(COBALT_ARCHITECTURE)-sbversion-$(COBALT_SB_API_VERSION)
 COBALT_TARGET?=cobalt
+COBALT_PARALLEL?=
 
 PACKAGE_NAME?=
 PACKAGE_NAME_OFFICIAL=youtube.leanback.v4
@@ -42,9 +43,9 @@ cobalt-patches: cobalt-patches/*.patch
 	done
 
 .PHONY: cobalt-build
-cobalt-build: cobalt-patches npm-docker
+cobalt-build: cobalt-patches
 	cd cobalt && \
-	docker-compose run -e NINJA_PARALLEL=8 -e CONFIG="$(COBALT_BUILD_TYPE)" -e TARGET="$(COBALT_TARGET)" -e SB_API_VERSION="$(COBALT_SB_API_VERSION)" $(COBALT_PLATFORM)
+	docker-compose run $(if $(COBALT_PARALLEL),-e NINJA_PARALLEL=$(COBALT_PARALLEL),) -e CONFIG="$(COBALT_BUILD_TYPE)" -e TARGET="$(COBALT_TARGET)" -e SB_API_VERSION="$(COBALT_SB_API_VERSION)" $(COBALT_PLATFORM)
 
 .PHONY: cobalt-build-test
 cobalt-build-test: COBALT_PLATFORM=linux-x64x11
