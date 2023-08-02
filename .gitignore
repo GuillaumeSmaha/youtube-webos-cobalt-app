@@ -6,3 +6,6 @@ youtube-webos/node_modules
 /.vscode
 *.pyc
 /output/*
+/node_modules
+/package.json
+/package-lock.json

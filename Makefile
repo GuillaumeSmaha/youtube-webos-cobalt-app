@@ -10,7 +10,7 @@ PACKAGE_NAME_OFFICIAL=youtube.leanback.v4
 PACKAGE_NAME_TARGET=$(if $(PACKAGE_NAME),$(PACKAGE_NAME),$(PACKAGE_NAME_OFFICIAL))
 OFFICAL_YOUTUBE_IPK?=ipks-official/2023-07-30-youtube.leanback.v4.ipk
 
-SHELL?=/bin/bash
+SHELL=/bin/bash
 
 .PHONY: all
 all: ipk-unpack cobalt-build package
@@ -95,14 +95,26 @@ endif
 	fi
 	cp -r cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/content/web/adblock/ ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/content/web/
 	echo " --evergreen_lite" >> ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/switches
-
-.PHONY: package
-package: ipk-update
 	cp -r ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET) ipk/package/usr/palm/applications
 	rm -fr ipk/package/usr/palm/data
 	rm -f ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/drm.nfz
 	cp -r ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET) ipk/ipk
-	ares-package -v -c ipk/ipk
-	ares-package -v --outdir ./output ipk/ipk
+
+.PHONY: ares-package
+ares-package:
+	aresCmd=$$(command -v ares-package); \
+	if [ "$$aresCmd" == "" ]; then \
+		npm install @webosose/ares-cli; \
+		aresCmd=node_modules/.bin/ares-package; \
+	fi; \
+	$$aresCmd -v -c ipk/ipk; \
+	$$aresCmd -v --outdir ./output ipk/ipk
+
+.PHONY: ares-package-docker
+ares-package-docker:
+	docker run --rm -ti -u $$(id -u):$$(id -g) -v $$PWD:/app -w /app node:18 make ares-package
+
+.PHONY: package
+package: ipk-update ares-package-docker
 	echo "Package can be installed with:"
 	echo "  ares-install ./output/<file>.ipk"
