@@ -1,5 +1,5 @@
 COBALT_BUILD_TYPE?=gold
-COBALT_SB_API_VERSION?=$(shell strings ipk/image/usr/palm/applications/$(PACKAGE_NAME_OFFICIAL)/cobalt | grep sb_api | jq -r '.sb_api_version' | grep -v null)
+COBALT_SB_API_VERSION?=$(shell strings $(WORKDIR)/image/usr/palm/applications/$(PACKAGE_NAME_OFFICIAL)/cobalt | grep sb_api | jq -r '.sb_api_version' | grep -v null)
 COBALT_ARCHITECTURE?=arm-softfp
 COBALT_PLATFORM?=evergreen-$(COBALT_ARCHITECTURE)
 COBALT_TARGET?=cobalt
@@ -9,6 +9,8 @@ PACKAGE_NAME?=
 PACKAGE_NAME_OFFICIAL=youtube.leanback.v4
 PACKAGE_NAME_TARGET=$(if $(PACKAGE_NAME),$(PACKAGE_NAME),$(PACKAGE_NAME_OFFICIAL))
 OFFICAL_YOUTUBE_IPK?=ipks-official/2023-07-30-youtube.leanback.v4-1.1.7.ipk
+
+WORKDIR?=workdir
 
 SHELL=/bin/bash
 
@@ -71,11 +73,11 @@ clean-ipk:
 
 .PHONY: ipk-unpack
 ipk-unpack: clean-ipk
-	mkdir -p ipk/unpacked_ipk ipk/package ipk/image
-	ar x --output ipk/unpacked_ipk $(OFFICAL_YOUTUBE_IPK)
-	tar xvzpf ipk/unpacked_ipk/control.tar.gz -C ipk/unpacked_ipk
-	tar xvzpf ipk/unpacked_ipk/data.tar.gz -C ipk/package
-	unsquashfs -f -d ipk/image ipk/package/usr/palm/data/images/$(PACKAGE_NAME_OFFICIAL)/data.img
+	mkdir -p $(WORKDIR)/unpacked_ipk $(WORKDIR)/package $(WORKDIR)/image
+	ar x --output $(WORKDIR)/unpacked_ipk $(OFFICAL_YOUTUBE_IPK)
+	tar xvzpf $(WORKDIR)/unpacked_ipk/control.tar.gz -C $(WORKDIR)/unpacked_ipk
+	tar xvzpf $(WORKDIR)/unpacked_ipk/data.tar.gz -C $(WORKDIR)/package
+	unsquashfs -f -d $(WORKDIR)/image $(WORKDIR)/package/usr/palm/data/images/$(PACKAGE_NAME_OFFICIAL)/data.img
 
 .PHONY: ipk-update
 ipk-update:
@@ -83,27 +85,27 @@ ifneq ("$(PACKAGE_NAME_TARGET)","$(PACKAGE_NAME_OFFICIAL)")
 	find ipk -type d -name 'youtube.leanback.v4' | xargs -n1 rename "s/$(PACKAGE_NAME_OFFICIAL)/$(PACKAGE_NAME_TARGET)/"
 	grep -l -R "youtube.leanback.v4" ipk | grep .json | xargs -n 1 sed -i "s/$(PACKAGE_NAME_OFFICIAL)/$(PACKAGE_NAME_TARGET)/g"
 endif
-	sed -i 's/YouTube/YouTube Cobalt AdBlock/g' ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json
-	jq 'del(.fileSystemType)' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json >  ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo2.json
-	mv ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo2.json ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json
-	cp assets/icon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.icon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
-	cp assets/mediumLargeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.mediumLargeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
-	cp assets/largeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.largeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
-	cp assets/extraLargeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.extraLargeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
-	cp assets/playIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.playIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
-	cp assets/imageForRecents.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.imageForRecents' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	sed -i 's/YouTube/YouTube Cobalt AdBlock/g' $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json
+	jq 'del(.fileSystemType)' < $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json >  $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo2.json
+	mv $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo2.json $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json
+	cp assets/icon.png $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.icon' < $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/mediumLargeIcon.png $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.mediumLargeIcon' < $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/largeIcon.png $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.largeIcon' < $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/extraLargeIcon.png $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.extraLargeIcon' < $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/playIcon.png $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.playIcon' < $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
+	cp assets/imageForRecents.png $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.imageForRecents' < $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
 	if [ -f cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ]; then \
-		cp cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
+		cp cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so $(WORKDIR)/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
 	fi
 	if [ -f cobalt/out/$(COBALT_PLATFORM-sbversion-$(COBALT_SB_API_VERSION))_$(COBALT_BUILD_TYPE)/libcobalt.so ]; then \
-		cp cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
+		cp cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/libcobalt.so $(WORKDIR)/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
 	fi
-	cp -r cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/content/web/adblock/ ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/content/web/
-	echo " --evergreen_lite" >> ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/switches
-	cp -r ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET) ipk/package/usr/palm/applications
-	rm -fr ipk/package/usr/palm/data
-	rm -f ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/drm.nfz
-	cp -r ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET) ipk/ipk
+	cp -r cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/content/web/adblock/ $(WORKDIR)/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/content/web/
+	echo " --evergreen_lite" >> $(WORKDIR)/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/switches
+	cp -r $(WORKDIR)/image/usr/palm/applications/$(PACKAGE_NAME_TARGET) $(WORKDIR)/package/usr/palm/applications
+	rm -fr $(WORKDIR)/package/usr/palm/data
+	rm -f $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/drm.nfz
+	cp -r $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_TARGET) $(WORKDIR)/ipk
 
 .PHONY: ares-package
 ares-package:
@@ -112,8 +114,8 @@ ares-package:
 		npm install @webosose/ares-cli; \
 		aresCmd=node_modules/.bin/ares-package; \
 	fi; \
-	$$aresCmd -v -c ipk/ipk; \
-	$$aresCmd -v --outdir ./output ipk/ipk
+	$$aresCmd -v -c $(WORKDIR)/ipk; \
+	$$aresCmd -v --outdir ./output $(WORKDIR)/ipk
 
 .PHONY: ares-package-docker
 ares-package-docker: docker-make.ares-package

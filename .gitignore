@@ -1,7 +1,7 @@
 youtube-webos/node_modules
 /dist
 /cobalt
-/ipk
+/workdir
 /.env
 /.vscode
 *.pyc
