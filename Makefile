@@ -1,7 +1,7 @@
 COBALT_BUILD_TYPE?=gold
-COBALT_SB_API_VERSION?=12
+COBALT_SB_API_VERSION?=$(shell strings ipk/image/usr/palm/applications/$(PACKAGE_NAME_OFFICIAL)/cobalt | grep sb_api | jq -r '.sb_api_version' | grep -v null)
 COBALT_ARCHITECTURE?=arm-softfp
-COBALT_PLATFORM?=evergreen-$(COBALT_ARCHITECTURE)-sbversion-$(COBALT_SB_API_VERSION)
+COBALT_PLATFORM?=evergreen-$(COBALT_ARCHITECTURE)
 COBALT_TARGET?=cobalt
 COBALT_PARALLEL?=
 
@@ -13,7 +13,7 @@ OFFICAL_YOUTUBE_IPK?=ipks-official/2023-07-30-youtube.leanback.v4.ipk
 SHELL=/bin/bash
 
 .PHONY: all
-all: ipk-unpack cobalt-build package
+all: npm-docker clean-ipk ipk-unpack cobalt-build ipk-update ares-package
 	@echo ""
 
 .PHONY: cobalt
@@ -24,6 +24,35 @@ cobalt: npm cobalt-build
 cobalt-clean:
 	(cd cobalt ; git checkout . ; git clean -d -f)
 
+.PHONY: cobalt-patches
+cobalt-patches: cobalt-patches/*.patch
+	@for file in $^ ; do \
+		[ -f ./cobalt/.$$file ] && echo "Already applied "$$file || (echo "Apply patch "$$file ; ( cd cobalt ; patch -p1 < ../$$file ; mkdir -p $$(dirname .$$file) ; touch .$$file )) ; \
+	done
+
+.PHONY: cobalt-build
+cobalt-build: cobalt-patches
+	@echo "Current IPK is using SB API version "$(COBALT_SB_API_VERSION)
+	@if [ "$(COBALT_SB_API_VERSION)" == "" ]; then \
+		echo "  Cannot find automatically SBAPI for the IPK $(OFFICAL_YOUTUBE_IPK)"; \
+		echo "  Try to manually define SBAPI version with:"; \
+		echo "    make COBALT_SB_API_VERSION=xyz"; \
+		exit 1; \
+	fi
+	@echo "  Build Cobalt using SB API version "$(COBALT_SB_API_VERSION)
+	cd cobalt && \
+	docker-compose run $(if $(COBALT_PARALLEL),-e NINJA_PARALLEL=$(COBALT_PARALLEL),) -e CONFIG="$(COBALT_BUILD_TYPE)" -e TARGET="$(COBALT_TARGET)" -e SB_API_VERSION="$(COBALT_SB_API_VERSION)" $(COBALT_PLATFORM)
+
+.PHONY: cobalt-build-test
+cobalt-build-test: COBALT_PLATFORM=linux-x64x11
+cobalt-build-test: cobalt-build
+	@echo "Done"
+
+
+.PHONY: docker-make.%
+docker-make.%:
+	docker run --rm -ti -u $$(id -u):$$(id -g) -v $$PWD:/app -w /app node:18 make $*
+
 .PHONY: npm
 npm:
 	( \
@@ -33,25 +62,8 @@ npm:
 	)
 
 .PHONY: npm-docker
-npm-docker:
-	docker run --rm -ti -u $$(id -u):$$(id -g) -v $$PWD:/app -w /app node:18 make npm
-
-.PHONY: cobalt-patches
-cobalt-patches: cobalt-patches/*.patch
-	@for file in $^ ; do \
-		[ -f ./cobalt/.$$file ] && echo "Already applied "$$file || (echo "Apply patch "$$file ; ( cd cobalt ; patch -p1 < ../$$file ; mkdir -p $$(dirname .$$file) ; touch .$$file )) ; \
-	done
-
-.PHONY: cobalt-build
-cobalt-build: cobalt-patches
-	cd cobalt && \
-	docker-compose run $(if $(COBALT_PARALLEL),-e NINJA_PARALLEL=$(COBALT_PARALLEL),) -e CONFIG="$(COBALT_BUILD_TYPE)" -e TARGET="$(COBALT_TARGET)" -e SB_API_VERSION="$(COBALT_SB_API_VERSION)" $(COBALT_PLATFORM)
-
-.PHONY: cobalt-build-test
-cobalt-build-test: COBALT_PLATFORM=linux-x64x11
-cobalt-build-test: cobalt-build
-	@echo "Done"
-
+npm-docker: docker-make.npm
+	@echo ""
 
 .PHONY: clean-ipk
 clean-ipk:
@@ -64,13 +76,6 @@ ipk-unpack: clean-ipk
 	tar xvzpf ipk/unpacked_ipk/control.tar.gz -C ipk/unpacked_ipk
 	tar xvzpf ipk/unpacked_ipk/data.tar.gz -C ipk/package
 	unsquashfs -f -d ipk/image ipk/package/usr/palm/data/images/$(PACKAGE_NAME_OFFICIAL)/data.img
-	ipkOfficialVersion=$$(strings ipk/image/usr/palm/applications/$(PACKAGE_NAME_OFFICIAL)/cobalt | grep sb_api | jq -r '.sb_api_version'); \
-	if [ "$(COBALT_SB_API_VERSION)" != "$$ipkOfficialVersion" ]; then \
-		echo "Incompatible SB API version:"; \
-		echo "  Current build is using "$(COBALT_SB_API_VERSION); \
-		echo "  Official IPK package is using "$$ipkOfficialVersion; \
-		exit 1; \
-	fi
 
 .PHONY: ipk-update
 ipk-update:
@@ -87,13 +92,13 @@ endif
 	cp assets/extraLargeIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.extraLargeIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
 	cp assets/playIcon.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.playIcon' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
 	cp assets/imageForRecents.png ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/$$(jq -r '.imageForRecents' < ipk/package/usr/palm/applications/$(PACKAGE_NAME_TARGET)/appinfo.json)
-	if [ -f cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ]; then \
-		cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
+	if [ -f cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ]; then \
+		cp cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/lib/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
 	fi
-	if [ -f cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/libcobalt.so ]; then \
-		cp cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
+	if [ -f cobalt/out/$(COBALT_PLATFORM-sbversion-$(COBALT_SB_API_VERSION))_$(COBALT_BUILD_TYPE)/libcobalt.so ]; then \
+		cp cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/libcobalt.so ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/lib/libcobalt.so; \
 	fi
-	cp -r cobalt/out/$(COBALT_PLATFORM)_$(COBALT_BUILD_TYPE)/content/web/adblock/ ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/content/web/
+	cp -r cobalt/out/$(COBALT_PLATFORM)-sbversion-$(COBALT_SB_API_VERSION)_$(COBALT_BUILD_TYPE)/content/web/adblock/ ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/content/app/cobalt/content/web/
 	echo " --evergreen_lite" >> ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET)/switches
 	cp -r ipk/image/usr/palm/applications/$(PACKAGE_NAME_TARGET) ipk/package/usr/palm/applications
 	rm -fr ipk/package/usr/palm/data
@@ -111,10 +116,26 @@ ares-package:
 	$$aresCmd -v --outdir ./output ipk/ipk
 
 .PHONY: ares-package-docker
-ares-package-docker:
-	docker run --rm -ti -u $$(id -u):$$(id -g) -v $$PWD:/app -w /app node:18 make ares-package
+ares-package-docker: docker-make.ares-package
+	@echo ""
+
+.PHONY: ares-install
+ares-install:
+	aresCmd=$$(command -v ares-install); \
+	if [ "$$aresCmd" == "" ]; then \
+		npm install @webosose/ares-cli; \
+		aresCmd=node_modules/.bin/ares-install; \
+	fi; \
+	$$aresCmd ./output/$(shell ls --sort=time output | head -n 1)
+
+.PHONY: ares-install-docker
+ares-install-docker: docker-make.ares-install
 
 .PHONY: package
-package: ipk-update ares-package-docker
-	echo "Package can be installed with:"
-	echo "  ares-install ./output/<file>.ipk"
+package: clean-ipk ipk-unpack ipk-update ares-package-docker
+	@echo "Package can be installed with:"
+	@echo "  ares-install ./output/<file>.ipk"
+	@echo "  or"
+	@echo "  make ares-install"
+	@echo "  or"
+	@echo "  make ares-install-docker"

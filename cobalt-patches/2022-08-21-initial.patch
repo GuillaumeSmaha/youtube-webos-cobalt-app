@@ -110,7 +110,7 @@ index c35472cba23..80555354ebc 100644
      // Update the current timeline sample time and then update computed styles
      // before dispatching the onload event.  This guarantees that computed
 diff --git a/docker-compose.yml b/docker-compose.yml
-index d575bc31f56..2a5b1087d58 100644
+index d575bc31f56..d9cbfe598bc 100644
 --- a/docker-compose.yml
 +++ b/docker-compose.yml
 @@ -61,10 +61,11 @@ x-shared-unittest-definitions: &shared-unittest-definitions
@@ -127,7 +127,23 @@ index d575bc31f56..2a5b1087d58 100644
    # TODO: Get NPLB unittests to run with IPv6 without using the host network.
    network_mode: "host"
    depends_on: [ base ]
-@@ -396,7 +397,7 @@ services:
+@@ -193,6 +194,7 @@ services:
+       PLATFORM: linux-x64x11
+       CONFIG: ${CONFIG:-debug}
+       TARGET: ${TARGET:-cobalt_install}
++      SB_API_VERSION: ${SB_API_VERSION:-12}
+ 
+   linux-x64x11-bionic:
+     <<: *common-definitions
+@@ -389,6 +391,7 @@ services:
+       <<: *shared-build-env
+       PLATFORM: evergreen-arm-softfp
+       TARGET_CPU: ${TARGET_CPU:-arm}
++      SB_API_VERSION: ${SB_API_VERSION:-12}
+ 
+   evergreen-arm-softfp-sbversion-12:
+     <<: *build-common-definitions
+@@ -396,7 +399,7 @@ services:
      depends_on: [ build-evergreen ]
      environment:
        <<: *shared-build-env
@@ -136,7 +152,7 @@ index d575bc31f56..2a5b1087d58 100644
        TARGET_CPU: ${TARGET_CPU:-arm}
        SB_API_VERSION: 12
  
-@@ -424,7 +425,7 @@ services:
+@@ -424,7 +427,7 @@ services:
      depends_on: [ build-evergreen ]
      environment:
        <<: *shared-build-env
