@@ -24,7 +24,7 @@ module.exports = (env) => [
       adblockMain: './src/adblock-main.js'
     },
     output: {
-      path: path.resolve(__dirname, '../cobalt/cobalt/adblock/content')
+      path: path.resolve(__dirname, './output')
     },
     resolve: {
       extensions: ['.ts', '.js']
