@@ -63,7 +63,7 @@ In order to disable autostart run this:
 luna-send -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.leanback.v4"}'
 ```
 
-## Building
+## Patching your IPK
 
 - Install docker:
 
@@ -74,7 +74,7 @@ Make sure to install all docker components like `docker-buildx-plugin` and ` doc
 - Install tools
 
 ```sh
-sudo apt install jq git patch binutils squashfs-tools
+sudo apt install jq git patch sed binutils squashfs-tools rename findutils
 ```
 
 
@@ -84,22 +84,41 @@ sudo apt install jq git patch binutils squashfs-tools
 git clone https://github.com/GuillaumeSmaha/youtube-webos-cobalt.git
 ```
 
-- Enter the folder and get git submodule:
+- Enter the folder and you can patch your YouTube ipk
 ```sh
 cd youtube-webos-cobalt
 
-git submodule update --init
-```
-
-- From the same location, build the App, this will generate a `*.ipk` file in `output` directory
-```sh
-make
+make PACKAGE=./your-tv-youtube.ipk
 ```
 
 Customize package name:
-`PACKAGE_NAME` can be updated to change the package name
+`PACKAGE_NAME` can be defined to change the package name
 ```sh
-make PACKAGE_NAME=youtube-free.leanback.v4
+make PACKAGE=./your-tv-youtube.ipk PACKAGE_NAME=youtube-free.leanback.v4
+```
+
+## Build Cobalt
+
+If you don't trusted, pre-compiled version stored in `cobalt-bin`, you can build them yourself.
+
+The building process is:
+- Clone cobalt repository
+- Apply the patch defined in `cobalt-patches` directory to inject AdBlock javascript after the document is loaded.
+- Build libcobalt.so using docker-compose method.
+
+This process is handled by the following commands:
+```sh
+git clone https://github.com/FriedChickenButt/youtube-webos.git
+```
+
+- Enter the folder and call the build command, this will generate libcobalt.so file for the given versions.
+`make cobalt-bin/<COBALT_VERSION>-<SB_API_VERSION>/libcobalt.so cobalt-bin/<COBALT_VERSION>-<SB_API_VERSION>.xz`
+
+For example: for Cobalt 23.lts.4 and SB Api version 12:
+```sh
+cd youtube-webos-cobalt
+
+make cobalt-bin/23.lts.4-12/libcobalt.so cobalt-bin/23.lts.4-12.xz
 ```
 
 ### Building issue

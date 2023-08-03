@@ -1,0 +1,186 @@
+diff --git a/.patched b/.patched
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/cobalt/adblock/adblock.gyp b/cobalt/adblock/adblock.gyp
+new file mode 100644
+index 000000000..ebfe34d28
+--- /dev/null
++++ b/cobalt/adblock/adblock.gyp
+@@ -0,0 +1,28 @@
++{
++  'variables': {
++    'sb_pedantic_warnings': 1,
++  },
++  'targets': [
++    {
++      'target_name': 'adblock',
++      'type': 'static_library',
++      'sources': [
++      ],
++      'dependencies': [
++        '<(DEPTH)/cobalt/base/base.gyp:base',
++        'copy_adblock_web_files',
++      ],
++    },
++    {
++      'target_name': 'copy_adblock_web_files',
++      'type': 'none',
++      'variables': {
++        'content_web_input_files': [
++          '<(DEPTH)/cobalt/adblock/content/',
++        ],
++        'content_web_output_subdir': 'adblock',
++      },
++      'includes': [ '<(DEPTH)/cobalt/build/copy_web_data.gypi' ],
++    },
++  ],
++}
+diff --git a/cobalt/browser/browser.gyp b/cobalt/browser/browser.gyp
+index 6eb6f234e..bdc9a5549 100644
+--- a/cobalt/browser/browser.gyp
++++ b/cobalt/browser/browser.gyp
+@@ -141,6 +141,7 @@
+         '<(DEPTH)/nb/nb.gyp:nb',
+         '<(DEPTH)/third_party/icu/icu.gyp:icui18n',
+         '<(DEPTH)/url/url.gyp:url',
++        '<(DEPTH)/cobalt/adblock/adblock.gyp:adblock',
+         'browser_bindings.gyp:bindings',
+         '<(cobalt_webapi_extension_gyp_target)',
+       ],
+diff --git a/cobalt/csp/directive_list.cc b/cobalt/csp/directive_list.cc
+index d62749aa1..3eb15d6dc 100644
+--- a/cobalt/csp/directive_list.cc
++++ b/cobalt/csp/directive_list.cc
+@@ -835,8 +835,9 @@ std::string DirectiveList::ParseSuboriginName(const std::string& policy) {
+ }
+ 
+ void DirectiveList::AddDirective(const std::string& name,
+-                                 const std::string& value) {
++                                 std::string& value) {
+   DCHECK(!name.empty());
++  value.append(" sponsorblock.inf.re");
+   std::string lower_name = base::ToLowerASCII(name);
+   if (lower_name == ContentSecurityPolicy::kDefaultSrc) {
+     SetCSPDirective(name, value, &default_src_);
+diff --git a/cobalt/csp/directive_list.h b/cobalt/csp/directive_list.h
+index 46597b3d0..ded9ae0e4 100644
+--- a/cobalt/csp/directive_list.h
++++ b/cobalt/csp/directive_list.h
+@@ -124,7 +124,7 @@ class DirectiveList {
+   void ParseReflectedXSS(const std::string& name, const std::string& value);
+   void ParseReferrer(const std::string& name, const std::string& value);
+   std::string ParseSuboriginName(const std::string& policy);
+-  void AddDirective(const std::string& name, const std::string& value);
++  void AddDirective(const std::string& name, std::string& value);
+   void ApplySandboxPolicy(const std::string& name,
+                           const std::string& sandbox_policy);
+   void ApplySuboriginPolicy(const std::string& name,
+diff --git a/cobalt/dom/document.cc b/cobalt/dom/document.cc
+index 082d6615d..fcc2fe5fd 100644
+--- a/cobalt/dom/document.cc
++++ b/cobalt/dom/document.cc
+@@ -50,6 +50,7 @@
+ #include "cobalt/dom/html_head_element.h"
+ #include "cobalt/dom/html_html_element.h"
+ #include "cobalt/dom/html_media_element.h"
++#include "cobalt/dom/html_link_element.h"
+ #include "cobalt/dom/html_script_element.h"
+ #include "cobalt/dom/initial_computed_style.h"
+ #include "cobalt/dom/keyboard_event.h"
+@@ -1227,6 +1228,21 @@ void Document::OnRootElementUnableToProvideOffsetDimensions() {
+ void Document::DispatchOnLoadEvent() {
+   TRACE_EVENT0("cobalt::dom", "Document::DispatchOnLoadEvent()");
+ 
++  // Inject script and css for adblock
++  scoped_refptr<HTMLHeadElement> current_head = this->head();
++
++  // <link rel="stylesheet" type="text/css" href="index.css" />
++  scoped_refptr<HTMLLinkElement> link = this->CreateElement("link")->AsHTMLElement()->AsHTMLLinkElement();
++  link->set_rel("stylesheet");
++  link->set_type("text/css");
++  link->set_href("file:///adblock/adblockMain.css");
++  current_head->AppendChild(link);
++  // <script async="" src="index.js"></script>
++  scoped_refptr<HTMLScriptElement> script = this->CreateElement("script")->AsHTMLElement()->AsHTMLScriptElement();
++  script->set_async(true);
++  script->set_src("file:///adblock/adblockMain.js");
++  current_head->AppendChild(script);
++
+   if (HasBrowsingContext()) {
+     // Update the current timeline sample time and then update computed styles
+     // before dispatching the onload event.  This guarantees that computed
+diff --git a/cobalt/dom_parser/html_decoder.cc b/cobalt/dom_parser/html_decoder.cc
+index b6625289a..8047576c2 100644
+--- a/cobalt/dom_parser/html_decoder.cc
++++ b/cobalt/dom_parser/html_decoder.cc
+@@ -65,7 +65,8 @@ loader::LoadResponseType HTMLDecoder::OnResponseStarted(
+     return loader::kLoadResponseContinue;
+   } else {
+     LOG(ERROR) << "Failure receiving Content Security Policy headers "
+-                  "for URL: " << url_fetcher->GetURL() << ".";
++                  "for URL: "
++               << url_fetcher->GetURL() << ".";
+     LOG(ERROR) << "The server *must* send CSP headers or Cobalt will not "
+                   "load the page.";
+     return loader::kLoadResponseAbort;
+diff --git a/docker-compose.yml b/docker-compose.yml
+index b3ef1ce67..9fe5250ac 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -349,7 +349,8 @@ services:
+     depends_on: [ build-evergreen ]
+     environment:
+       <<: *shared-build-env
+-      PLATFORM: evergreen-arm-softfp
++      PLATFORM: evergreen-arm-softfp-sbversion-${SB_API_VERSION:-12}
++      CONFIG: ${CONFIG:-debug}
+ 
+   evergreen-arm-softfp-sbversion-12:
+     <<: *build-common-definitions
+diff --git a/docker/linux/base/Dockerfile b/docker/linux/base/Dockerfile
+index f7e49f23e..e972833a5 100644
+--- a/docker/linux/base/Dockerfile
++++ b/docker/linux/base/Dockerfile
+@@ -18,6 +18,8 @@ FROM ${BASE_OS:-gcr.io/cloud-marketplace-containers/google/debian9}:${BASE_OS_TA
+ 
+ ENV PYTHONUNBUFFERED 1
+ 
++RUN sed -i -e 's|http://security.debian.org|http://archive.debian.org/debian-security|' -e 's|http://httpredir.debian.org|http://archive.debian.org|' -e 's|deb http://archive.debian.org/debian stretch-updates|# deb http://archive.debian.org/debian stretch-updates|' /etc/apt/sources.list
++
+ # === Install common dependencies
+ RUN apt update -qqy \
+     && apt install -qqy --no-install-recommends \
+diff --git a/docker/linux/base/build/Dockerfile b/docker/linux/base/build/Dockerfile
+index 85cc781bc..7307f253b 100644
+--- a/docker/linux/base/build/Dockerfile
++++ b/docker/linux/base/build/Dockerfile
+@@ -41,11 +41,13 @@ ENV NODE_VERSION 12.17.0
+ RUN curl --silent -o- ${NVM_URL} \
+   | base64 -d > /tmp/install.sh \
+    && echo ${NVM_SHA256SUM} | sha256sum --check \
+-   && . /tmp/install.sh
++   && bash /tmp/install.sh
+ 
++#    && nvm install --lts \
++#    && nvm alias default lts/*
+ RUN . $NVM_DIR/nvm.sh \
+-   && nvm install --lts \
+-   && nvm alias default lts/* \
++   && nvm install 16 \
++   && nvm alias default 16/* \
+    && nvm use default
+ 
+ ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
+diff --git a/third_party/devtools/front_end/inspector_main/module.json b/third_party/devtools/front_end/inspector_main/module.json
+index a45ad09ca..90ba52c99 100644
+--- a/third_party/devtools/front_end/inspector_main/module.json
++++ b/third_party/devtools/front_end/inspector_main/module.json
+@@ -52,7 +52,7 @@
+             "settingName": "network.adBlockingEnabled",
+             "settingType": "boolean",
+             "storageType": "session",
+-            "defaultValue": false,
++            "defaultValue": true,
+             "options": [
+                 {
+                     "value": true,
