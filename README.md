@@ -69,12 +69,12 @@ luna-send -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.le
 
 Follow instructions on https://docs.docker.com/engine/install/
 
-Make sure to install all docker components like `docker-buildx-plugin` and ` docker-compose-plugin`.
+Make sure to install all docker components like `docker-buildx-plugin` and `docker-compose-plugin`.
 
 - Install tools
 
 ```sh
-sudo apt install jq git patch sed binutils squashfs-tools rename findutils
+sudo apt install jq git patch sed binutils squashfs-tools rename findutils xz-utils
 ```
 
 
