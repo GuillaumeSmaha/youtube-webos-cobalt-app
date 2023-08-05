@@ -107,15 +107,13 @@ The building process is:
 - Build libcobalt.so using docker-compose method.
 
 This process is handled by the following commands:
-```sh
-git clone https://github.com/FriedChickenButt/youtube-webos.git
-```
-
-- Enter the folder and call the build command, this will generate libcobalt.so file for the given versions.
+- Clone the repo, enter the folder and call the build command, this will generate libcobalt.so file for the given versions.
 `make cobalt-bin/<COBALT_VERSION>-<SB_API_VERSION>/libcobalt.so cobalt-bin/<COBALT_VERSION>-<SB_API_VERSION>.xz`
 
 For example: for Cobalt 23.lts.4 and SB Api version 12:
 ```sh
+git clone https://github.com/FriedChickenButt/youtube-webos.git
+
 cd youtube-webos-cobalt
 
 make cobalt-bin/23.lts.4-12/libcobalt.so cobalt-bin/23.lts.4-12.xz
