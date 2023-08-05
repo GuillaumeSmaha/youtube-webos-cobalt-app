@@ -187,7 +187,7 @@ $(WORKDIR)/cobalt-%/.patched:
 
 .PRECIOUS: $(WORKDIR)/cobalt-%/cobalt/adblock/content
 $(WORKDIR)/cobalt-%/cobalt/adblock/content :
-	mkdir $@
+	mkdir -p $@
 
 define webos_youtube_app_rule
 youtube-webos/output/$(1):
