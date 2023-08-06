@@ -225,7 +225,7 @@ cobalt-bin/%.xz:
 
 cobalt-bin/%-x64x11/cobalt: BUILD_VERSION=$*
 cobalt-bin/%-x64x11/cobalt: BUILD_COBALT_PLATFORM=linux-x64x11
-cobalt-bin/%-x64x11/cobalt: cobalt-bin/libcobalt-%-linux-x64x11/libcobalt.so ;
+cobalt-bin/%-x64x11/cobalt: cobalt-bin/%-linux-x64x11/libcobalt.so ;
 
 .PHONY: FORCE
 .FORCE: ;
