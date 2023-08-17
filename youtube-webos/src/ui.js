@@ -249,6 +249,7 @@ export function userScriptStartUI() {
       ? 'hidden'
       : 'visible';
   }, false);
+  document.querySelector("ytlr-logo-entity").style.visibility = configRead('hideLogo')
 }
 
 export function showNotification(text, time = 3000) {
