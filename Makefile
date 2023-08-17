@@ -175,7 +175,7 @@ npm-docker: docker-make.npm
 # make cobalt-bin/23.lts.4-12-x64x11/cobalt
 
 clean-$(WORKDIR)/cobalt-%:
-	cd $(WORKDIR)/cobalt-$* && git checkout . && git clean -d -f
+	cd $(WORKDIR)/cobalt-$* && git reset && git checkout . && git clean -d -f
 
 $(WORKDIR)/cobalt-%/:
 	git clone --depth 1 --branch $* https://github.com/youtube/cobalt.git $@
