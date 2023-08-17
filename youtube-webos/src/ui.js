@@ -92,6 +92,14 @@ export function userScriptStartUI() {
       callbackConfig('enableSponsorBlock')
     )
   );
+  uiContainer.appendChild(
+    checkboxTools.add(
+      '__hide_logo',
+      'Hide YouTube Logo',
+      configRead('hideLogo'),
+      callbackConfig('hideLogo')
+    )
+  );
 
   const sponsorBlock = document.createElement('div');
   sponsorBlock.classList.add('blockquote');
@@ -234,6 +242,13 @@ export function userScriptStartUI() {
   setTimeout(() => {
     showNotification('Press [GREEN] to open YTAF configuration screen');
   }, 2000);
+
+  // Hide youtube logo from the top right
+  uiContainer.addEventListener("blur", (evt) => {
+    document.querySelector("ytlr-logo-entity").style.visibility = configRead('hideLogo')
+      ? 'hidden'
+      : 'visible';
+  }, false);
 }
 
 export function showNotification(text, time = 3000) {
