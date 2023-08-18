@@ -112,7 +112,7 @@ This process is handled by the following commands:
 
 For example: for Cobalt 23.lts.4 and SB Api version 12:
 ```sh
-git clone https://github.com/FriedChickenButt/youtube-webos.git
+git clone https://github.com/GuillaumeSmaha/youtube-webos-cobalt.git
 
 cd youtube-webos-cobalt
 
@@ -141,7 +141,7 @@ make cobalt-clean
 If you need to update Youtube-webos or if you don't trusted pre-generated version stored in `youtube-webos/output`, you can build them yourself.
 
 ```sh
-git clone https://github.com/FriedChickenButt/youtube-webos.git
+git clone https://github.com/GuillaumeSmaha/youtube-webos-cobalt.git
 
 cd youtube-webos-cobalt
 
