@@ -27,8 +27,8 @@ BUILD_COBALT_SB_API_VERSION=$(word 2, $(subst -, ,$(BUILD_VERSION)))
 BUILD_COBALT_ARCHITECTURE?=arm-softfp
 BUILD_COBALT_PLATFORM?=evergreen-$(BUILD_COBALT_ARCHITECTURE)
 BUILD_COBALT_TARGET?=cobalt
-BUILD_COBALT_YOUTUBE_APP_FILES_RULES=$(foreach file,$(WEBOS_YOUTUBE_APP_FILES),$(WORKDIR_COBALT)/cobalt/adblock/content/$(file))
 
+BUILD_WEBOS_YOUTUBE_APP_FILES_RULES=$(foreach file,$(WEBOS_YOUTUBE_APP_FILES),$(WORKDIR)/ipk/content/app/cobalt/content/web/adblock/$(file))
 WEBOS_YOUTUBE_APP_FILES?=index.html index.js adblockMain.js adblockMain.css
 
 
@@ -89,8 +89,21 @@ $(WORKDIR)/cobalt:
 	@! test -z $(PACKAGE_SB_API_VERSION) || (echo "" && echo "--" && echo "Cannot find SB_API_VERSION in IPK binary. You can try to specify it with: make PACKAGE_SB_API_VERSION=12" && exit 1)
 	tar -xJvf cobalt-bin/$(PACKAGE_COBALT_VERSION)-$(PACKAGE_SB_API_VERSION).xz -C $@
 
+
+define webos_youtube_app_rule
+youtube-webos/output/$(1):
+	$(MAKE) docker-make.npm
+	touch youtube-webos/output/$(1)
+
+.PRECIOUS: $(WORKDIR)/ipk/content/app/cobalt/content/web/adblock/$(1)
+$(WORKDIR)/ipk/content/app/cobalt/content/web/adblock/$(1): youtube-webos/output/$(1)
+	mkdir -p $(WORKDIR)/ipk/content/app/cobalt/content/web/adblock
+	cp youtube-webos/output/$(1) $(WORKDIR)/ipk/content/app/cobalt/content/web/adblock/$(1)
+endef
+$(foreach file,$(WEBOS_YOUTUBE_APP_FILES),$(eval $(call webos_youtube_app_rule,$(file))))
+
 .PRECIOUS: $(WORKDIR)/ipk/content/app/cobalt/content/web/adblock
-$(WORKDIR)/ipk/content/app/cobalt/content/web/adblock:
+$(WORKDIR)/ipk/content/app/cobalt/content/web/adblock: $(BUILD_WEBOS_YOUTUBE_APP_FILES_RULES)
 
 	mkdir -p $(WORKDIR)/ipk
 	cp -r $(WORKDIR)/package/usr/palm/applications/$(PACKAGE_NAME_OFFICIAL)/* $(WORKDIR)/ipk
@@ -119,6 +132,7 @@ endif
 	libcobalt=$$(find $(WORKDIR)/ipk -name libcobalt.so); \
 	! test -z "$$libcobalt" || (echo "" && echo "--" && echo "File \"libcobalt.so\" is not present in your IPK. This patch is not compatible with your IPK version." && exit 1) && \
 	cp $(WORKDIR)/cobalt/libcobalt.so $$libcobalt
+	cp -r $(WORKDIR)/cobalt/content $(WORKDIR)/ipk/content/app/cobalt
 	cp -r $(WORKDIR)/cobalt/content $(WORKDIR)/ipk/content/app/cobalt
 
 .PHONY: ares-package
@@ -185,27 +199,12 @@ $(WORKDIR)/cobalt-%/.patched:
 	cd $(dir $@) && patch -p1 < $(CURRENT_DIR)/cobalt-patches/cobalt-$*.patch || (echo "Missing patch for version $*" && exit 1)
 	touch $@
 
-.PRECIOUS: $(WORKDIR)/cobalt-%/cobalt/adblock/content
-$(WORKDIR)/cobalt-%/cobalt/adblock/content :
-	mkdir -p $@
-
-define webos_youtube_app_rule
-youtube-webos/output/$(1):
-	$(MAKE) docker-make.npm
-	touch youtube-webos/output/$(1)
-
-.PRECIOUS: $(WORKDIR)/cobalt-%/cobalt/adblock/content/$(1)
-$(WORKDIR)/cobalt-%/cobalt/adblock/content/$(1): $(WORKDIR)/cobalt-%/cobalt/adblock/content youtube-webos/output/$(1)
-	cp youtube-webos/output/$(1) $$(WORKDIR_COBALT)/cobalt/adblock/content/$(1)
-endef
-$(foreach file,$(WEBOS_YOUTUBE_APP_FILES),$(eval $(call webos_youtube_app_rule,$(file))))
-
 cobalt-bin:
 	mkdir cobalt-bin
 
 .PRECIOUS: cobalt-bin/libcobalt-%/libcobalt.so
 cobalt-bin/%/libcobalt.so: BUILD_VERSION=$*
-cobalt-bin/%/libcobalt.so: cobalt-bin $$(WORKDIR_COBALT)/ $$(WORKDIR_COBALT)/.patched $$(BUILD_COBALT_YOUTUBE_APP_FILES_RULES)
+cobalt-bin/%/libcobalt.so: cobalt-bin $$(WORKDIR_COBALT)/ $$(WORKDIR_COBALT)/.patched
 	cd $(WORKDIR_COBALT) && \
 	docker-compose run $(if $(BUILD_COBALT_PARALLEL),-e NINJA_PARALLEL=$(BUILD_COBALT_PARALLEL),) -e CONFIG="$(BUILD_COBALT_TYPE)" -e TARGET="$(BUILD_COBALT_TARGET)" -e SB_API_VERSION="$(BUILD_COBALT_SB_API_VERSION)" $(BUILD_COBALT_PLATFORM)
 	mkdir -p $(dir $@)

@@ -99,7 +99,7 @@ make PACKAGE=./your-tv-youtube.ipk PACKAGE_NAME=youtube-free.leanback.v4
 
 ## Build Cobalt
 
-If you don't trusted, pre-compiled version stored in `cobalt-bin`, you can build them yourself.
+If you need to update Cobalt patches or if you don't trusted pre-compiled version stored in `cobalt-bin`, you can build them yourself.
 
 The building process is:
 - Clone cobalt repository
@@ -119,20 +119,38 @@ cd youtube-webos-cobalt
 make cobalt-bin/23.lts.4-12/libcobalt.so cobalt-bin/23.lts.4-12.xz
 ```
 
+Then, you can call `make PACKAGE=./your-tv-youtube.ipk` to rebuild an IPK with your updated version of Cobalt
+
 ### Building issue
 
-If you already built the package, update the repo and got an error like `node-gyp not found`:
+If you already built cobalt for a different version and got an error like `node-gyp not found`:
 
-Try to clean docker image used to build.
+Try to clean docker image used to build and retry.
 ```sh
 docker image rm cobalt-build-evergreen cobalt-build-linux cobalt-build-base cobalt-base
 ```
 
-Try to clean old Cobalt builds:
+Try to clean old Cobalt builds and retry:
 ```sh
 rm -fr cobalt/out/
 make cobalt-clean
 ```
+
+## Build Youtube-Webos
+
+If you need to update Youtube-webos or if you don't trusted pre-generated version stored in `youtube-webos/output`, you can build them yourself.
+
+```sh
+git clone https://github.com/FriedChickenButt/youtube-webos.git
+
+cd youtube-webos-cobalt
+
+make npm-docker
+```
+
+After calling `make npm-docker`, files in `youtube-webos/output` will be updated.
+Then, you can call `make PACKAGE=./your-tv-youtube.ipk` to rebuild an IPK with your updated version of Youtube-webos
+
 
 ## Development TV setup
 

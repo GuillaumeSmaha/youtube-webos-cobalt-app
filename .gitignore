@@ -9,6 +9,5 @@ youtube-webos/node_modules
 /node_modules
 /package.json
 /package-lock.json
-/youtube-webos/output
 /cobalt-bin/*
 !/cobalt-bin/*.xz
