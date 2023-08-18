@@ -245,7 +245,7 @@ export function userScriptStartUI() {
 
   // Hide youtube logo from the top right
   function logoHideShow() {
-    document.querySelector("ytlr-logo-entity").style.opacity = configRead('hideLogo')
+    document.querySelector('ytlr-redux-connect-ytlr-logo-entity').style.opacity = configRead('hideLogo')
       ? '0'
       : '1';
   }
