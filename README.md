@@ -65,6 +65,16 @@ luna-send -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.le
 
 ## Patching your IPK
 
+Patching the Youtube IPK for your TV requires that the IPK was built as 2 binaries: `cobalt` and `libcobalt.so`.
+
+`cobalt` is handling the grahical part with the TV and `libcobalt.so` is handling the browser rendering and javascript engine.
+
+Cobalt is an open-source and it is possible to rebuild `libcobalt.so` and therefore inject `adblock.css` and `adblock.js` after the loading the Youtube webpage.
+
+![Cobalt Patch Process](./screenshots/patch-process.png)
+
+### Instruction to patch your IPK
+
 - Install docker:
 
 Follow instructions on https://docs.docker.com/engine/install/
