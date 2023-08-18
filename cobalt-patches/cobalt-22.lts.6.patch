@@ -1,31 +1,15 @@
 diff --git a/cobalt/csp/directive_list.cc b/cobalt/csp/directive_list.cc
-index d62749aa1..3eb15d6dc 100644
+index d62749aa1..6036fcef5 100644
 --- a/cobalt/csp/directive_list.cc
 +++ b/cobalt/csp/directive_list.cc
-@@ -835,8 +835,9 @@ std::string DirectiveList::ParseSuboriginName(const std::string& policy) {
- }
+@@ -540,6 +540,7 @@ void DirectiveList::Parse(const base::StringPiece& text) {
+     std::string name, value;
+     if (ParseDirective(directive_begin, position, &name, &value)) {
+       DCHECK(!name.empty());
++      value.append(" sponsorblock.inf.re");
+       AddDirective(name, value);
+     }
  
- void DirectiveList::AddDirective(const std::string& name,
--                                 const std::string& value) {
-+                                 std::string& value) {
-   DCHECK(!name.empty());
-+  value.append(" sponsorblock.inf.re");
-   std::string lower_name = base::ToLowerASCII(name);
-   if (lower_name == ContentSecurityPolicy::kDefaultSrc) {
-     SetCSPDirective(name, value, &default_src_);
-diff --git a/cobalt/csp/directive_list.h b/cobalt/csp/directive_list.h
-index 46597b3d0..ded9ae0e4 100644
---- a/cobalt/csp/directive_list.h
-+++ b/cobalt/csp/directive_list.h
-@@ -124,7 +124,7 @@ class DirectiveList {
-   void ParseReflectedXSS(const std::string& name, const std::string& value);
-   void ParseReferrer(const std::string& name, const std::string& value);
-   std::string ParseSuboriginName(const std::string& policy);
--  void AddDirective(const std::string& name, const std::string& value);
-+  void AddDirective(const std::string& name, std::string& value);
-   void ApplySandboxPolicy(const std::string& name,
-                           const std::string& sandbox_policy);
-   void ApplySuboriginPolicy(const std::string& name,
 diff --git a/cobalt/dom/document.cc b/cobalt/dom/document.cc
 index 082d6615d..fcc2fe5fd 100644
 --- a/cobalt/dom/document.cc
@@ -60,20 +44,6 @@ index 082d6615d..fcc2fe5fd 100644
    if (HasBrowsingContext()) {
      // Update the current timeline sample time and then update computed styles
      // before dispatching the onload event.  This guarantees that computed
-diff --git a/cobalt/dom_parser/html_decoder.cc b/cobalt/dom_parser/html_decoder.cc
-index b6625289a..8047576c2 100644
---- a/cobalt/dom_parser/html_decoder.cc
-+++ b/cobalt/dom_parser/html_decoder.cc
-@@ -65,7 +65,8 @@ loader::LoadResponseType HTMLDecoder::OnResponseStarted(
-     return loader::kLoadResponseContinue;
-   } else {
-     LOG(ERROR) << "Failure receiving Content Security Policy headers "
--                  "for URL: " << url_fetcher->GetURL() << ".";
-+                  "for URL: "
-+               << url_fetcher->GetURL() << ".";
-     LOG(ERROR) << "The server *must* send CSP headers or Cobalt will not "
-                   "load the page.";
-     return loader::kLoadResponseAbort;
 diff --git a/docker-compose.yml b/docker-compose.yml
 index b3ef1ce67..9fe5250ac 100644
 --- a/docker-compose.yml
