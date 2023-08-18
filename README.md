@@ -1,3 +1,4 @@
+
 # youtube-webos-cobalt
 
 YouTube App built with [Cobalt](https://cobalt.googlesource.com/cobalt/) with extended functionalities.
