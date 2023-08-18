@@ -244,12 +244,12 @@ export function userScriptStartUI() {
   }, 2000);
 
   // Hide youtube logo from the top right
-  uiContainer.addEventListener("blur", (evt) => {
-    document.querySelector("ytlr-logo-entity").style.visibility = configRead('hideLogo')
-      ? 'hidden'
-      : 'visible';
-  }, false);
-  document.querySelector("ytlr-logo-entity").style.visibility = configRead('hideLogo') ? 'hidden' : 'visible';
+  function logoHideShow() {
+    document.querySelector("ytlr-logo-entity").style.opacity = configRead('hideLogo')
+      ? '0'
+      : '1';
+  }
+  document.addEventListener('keyup', logoHideShow, true);
 }
 
 export function showNotification(text, time = 3000) {
