@@ -1,33 +1,17 @@
 diff --git a/cobalt/csp/directive_list.cc b/cobalt/csp/directive_list.cc
-index 77fd7a5fae..32fe4712b3 100644
+index 77fd7a5fa..766db62e6 100644
 --- a/cobalt/csp/directive_list.cc
 +++ b/cobalt/csp/directive_list.cc
-@@ -902,8 +902,9 @@ std::string DirectiveList::ParseSuboriginName(const std::string& policy) {
- }
+@@ -607,6 +607,7 @@ void DirectiveList::Parse(const base::StringPiece& text) {
+     std::string name, value;
+     if (ParseDirective(directive_begin, position, &name, &value)) {
+       DCHECK(!name.empty());
++      value.append(" sponsorblock.inf.re");
+       AddDirective(name, value);
+     }
  
- void DirectiveList::AddDirective(const std::string& name,
--                                 const std::string& value) {
-+                                 std::string& value) {
-   DCHECK(!name.empty());
-+  value.append(" sponsorblock.inf.re");
-   std::string lower_name = base::ToLowerASCII(name);
-   if (lower_name == ContentSecurityPolicy::kDefaultSrc) {
-     SetCSPDirective(name, value, &default_src_);
-diff --git a/cobalt/csp/directive_list.h b/cobalt/csp/directive_list.h
-index 38765c26a9..c8d11a8945 100644
---- a/cobalt/csp/directive_list.h
-+++ b/cobalt/csp/directive_list.h
-@@ -118,7 +118,7 @@ class DirectiveList {
-   void ParseReflectedXSS(const std::string& name, const std::string& value);
-   void ParseReferrer(const std::string& name, const std::string& value);
-   std::string ParseSuboriginName(const std::string& policy);
--  void AddDirective(const std::string& name, const std::string& value);
-+  void AddDirective(const std::string& name, std::string& value);
-   void ApplySandboxPolicy(const std::string& name,
-                           const std::string& sandbox_policy);
-   void ApplySuboriginPolicy(const std::string& name,
 diff --git a/cobalt/dom/document.cc b/cobalt/dom/document.cc
-index c35472cba2..80555354eb 100644
+index c35472cba..80555354e 100644
 --- a/cobalt/dom/document.cc
 +++ b/cobalt/dom/document.cc
 @@ -46,6 +46,7 @@
@@ -61,7 +45,7 @@ index c35472cba2..80555354eb 100644
      // Update the current timeline sample time and then update computed styles
      // before dispatching the onload event.  This guarantees that computed
 diff --git a/cobalt/dom_parser/html_decoder.cc b/cobalt/dom_parser/html_decoder.cc
-index 01267f3e91..fd465a79ec 100644
+index 01267f3e9..fd465a79e 100644
 --- a/cobalt/dom_parser/html_decoder.cc
 +++ b/cobalt/dom_parser/html_decoder.cc
 @@ -59,6 +59,11 @@ loader::LoadResponseType HTMLDecoder::OnResponseStarted(
@@ -85,7 +69,7 @@ index 01267f3e91..fd465a79ec 100644
  
  void HTMLDecoder::DecodeChunk(const char* data, size_t size) {
 diff --git a/docker-compose.yml b/docker-compose.yml
-index d575bc31f5..76cc5f4f28 100644
+index d575bc31f..76cc5f4f2 100644
 --- a/docker-compose.yml
 +++ b/docker-compose.yml
 @@ -61,10 +61,11 @@ x-shared-unittest-definitions: &shared-unittest-definitions
@@ -123,7 +107,7 @@ index d575bc31f5..76cc5f4f28 100644
    # Example usage of unittest:
    # 1. Build the containers for which you want to unittest
 diff --git a/docker/linux/evergreen/Dockerfile b/docker/linux/evergreen/Dockerfile
-index f03d18297a..0f55c8d0a5 100644
+index f03d18297..0f55c8d0a 100644
 --- a/docker/linux/evergreen/Dockerfile
 +++ b/docker/linux/evergreen/Dockerfile
 @@ -23,5 +23,5 @@ RUN apt update -qqy \
@@ -135,7 +119,7 @@ index f03d18297a..0f55c8d0a5 100644
 +CMD gn gen ${OUTDIR}/${PLATFORM}_sb-${SB_API_VERSION:-14}_${CONFIG:-debug} --args="target_platform=\"${PLATFORM}\" build_type=\"${CONFIG:-debug}\" target_cpu=\"${TARGET_CPU}\" sb_api_version=${SB_API_VERSION:-14}" && \
 +    ninja -v -j ${NINJA_PARALLEL} -C ${OUTDIR}/${PLATFORM}_sb-${SB_API_VERSION:-14}_${CONFIG:-debug} ${TARGET:-cobalt_install}
 diff --git a/docker/linux/linux-x64x11/Dockerfile b/docker/linux/linux-x64x11/Dockerfile
-index e28bacb9f6..d48a4de608 100644
+index e28bacb9f..d48a4de60 100644
 --- a/docker/linux/linux-x64x11/Dockerfile
 +++ b/docker/linux/linux-x64x11/Dockerfile
 @@ -30,5 +30,5 @@ RUN apt update -qqy \
@@ -147,7 +131,7 @@ index e28bacb9f6..d48a4de608 100644
 +CMD gn gen ${OUTDIR}/${PLATFORM}_sb-${SB_API_VERSION:-14}_${CONFIG} --args="target_platform=\"${PLATFORM}\" build_type=\"${CONFIG}\" sb_api_version=${SB_API_VERSION:-14}" && \
 +    ninja -v -j ${NINJA_PARALLEL} -C ${OUTDIR}/${PLATFORM}_sb-${SB_API_VERSION:-14}_${CONFIG} ${TARGET:-cobalt_install}
 diff --git a/third_party/devtools/front_end/inspector_main/module.json b/third_party/devtools/front_end/inspector_main/module.json
-index a45ad09caa..90ba52c993 100644
+index a45ad09ca..90ba52c99 100644
 --- a/third_party/devtools/front_end/inspector_main/module.json
 +++ b/third_party/devtools/front_end/inspector_main/module.json
 @@ -52,7 +52,7 @@
