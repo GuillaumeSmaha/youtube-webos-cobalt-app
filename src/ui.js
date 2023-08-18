@@ -10,6 +10,13 @@ import { checkboxTools } from './checkboxTools.js';
 
 let lastTabIndex = 0;
 
+// Hide youtube logo from the top right
+function logoHideShow() {
+  document.querySelector('ytlr-redux-connect-ytlr-logo-entity').style.opacity = configRead('hideLogo')
+    ? '0'
+    : '1';
+}
+
 export function userScriptStartUI() {
   // We handle key events ourselves.
   window.__spatialNavigation__.keyMode = 'NONE';
@@ -92,14 +99,6 @@ export function userScriptStartUI() {
       callbackConfig('enableSponsorBlock')
     )
   );
-  uiContainer.appendChild(
-    checkboxTools.add(
-      '__hide_logo',
-      'Hide YouTube Logo',
-      configRead('hideLogo'),
-      callbackConfig('hideLogo')
-    )
-  );
 
   const sponsorBlock = document.createElement('div');
   sponsorBlock.classList.add('blockquote');
@@ -152,6 +151,18 @@ export function userScriptStartUI() {
     )
   );
   uiContainer.appendChild(sponsorBlock);
+
+  uiContainer.appendChild(
+    checkboxTools.add(
+      '__hide_logo',
+      'Hide YouTube Logo',
+      configRead('hideLogo'),
+      (newState) => {
+        configWrite('hideLogo', newState);
+        logoHideShow();
+      }
+    )
+  );
 
   const sponsorLink = document.createElement('div');
   sponsorLink.classList.add('small');
@@ -241,15 +252,13 @@ export function userScriptStartUI() {
 
   setTimeout(() => {
     showNotification('Press [GREEN] to open YTAF configuration screen');
+    logoHideShow();
   }, 2000);
 
-  // Hide youtube logo from the top right
-  function logoHideShow() {
-    document.querySelector('ytlr-redux-connect-ytlr-logo-entity').style.opacity = configRead('hideLogo')
-      ? '0'
-      : '1';
-  }
-  document.addEventListener('keyup', logoHideShow, true);
+  logoHideShow();
+  setTimeout(() => {
+    logoHideShow();
+  }, 4000);
 }
 
 export function showNotification(text, time = 3000) {
