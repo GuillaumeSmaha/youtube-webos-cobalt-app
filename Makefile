@@ -62,7 +62,7 @@ ares-install:
 .PHONY: check-package
 check-package:
 	@test ! -z "$(PACKAGE)" || (echo "\"make PACKAGE=./my-tv-youtube-application.ipk\" is required" && echo "--" && echo "" && $(MAKE) help && exit 1)
-	@test -f $(PACKAGE) || (cho "File \"$(PACKAGE)\" does not exist" && echo "--" && echo "" && exit 1)
+	@test -f $(PACKAGE) || (echo "File \"$(PACKAGE)\" does not exist" && echo "--" && echo "" && exit 1)
 	@echo ""
 
 .PHONY: package
