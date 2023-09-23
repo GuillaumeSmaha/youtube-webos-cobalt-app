@@ -112,7 +112,7 @@ $(WORKDIR)/ipk/content/app/cobalt/content/web/adblock: $(BUILD_WEBOS_YOUTUBE_APP
 	fi
 
 	rm -f $(WORKDIR)/ipk/drm.nfz
-	sed -i 's/YouTube/YouTube Cobalt AdBlock/g' $(WORKDIR)/ipk/appinfo.json
+	sed -i 's/"title":"YouTube"/"title":"YouTube Cobalt AdBlock"/g' $(WORKDIR)/ipk/appinfo.json
 	jq 'del(.fileSystemType)' < $(WORKDIR)/ipk/appinfo.json > $(WORKDIR)/ipk/appinfo2.json
 	mv $(WORKDIR)/ipk/appinfo2.json $(WORKDIR)/ipk/appinfo.json
 
