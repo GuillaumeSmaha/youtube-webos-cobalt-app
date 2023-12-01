@@ -3,7 +3,6 @@ const defaultConfig = {
   hideLogo: false,
   enableAdBlock: true,
   enableSponsorBlock: true,
-  hideLogo: false,
   enableSponsorBlockSponsor: true,
   enableSponsorBlockIntro: true,
   enableSponsorBlockOutro: true,
