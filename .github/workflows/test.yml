@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - '*'
-      - '!main'
+      - '!cobalt'
   pull_request:
     branches:
       - '*'
-      - '!main'
+      - '!cobalt'
 
 jobs:
   build:

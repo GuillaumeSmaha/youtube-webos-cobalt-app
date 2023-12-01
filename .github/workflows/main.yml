@@ -5,9 +5,9 @@ name: Build & Test
 
 on:
   push:
-    branches: [main]
+    branches: [cobalt]
   pull_request:
-    branches: [main]
+    branches: [cobalt]
 
 jobs:
   build:
