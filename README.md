@@ -4,9 +4,9 @@
 
 This application is a rework of https://github.com/webosbrew/youtube-webos to only use `div` tag.
 
-The aim of this application is to used on Cobalt which [only support a subset of HTML tags](https://cobalt.dev/development/reference/supported-features.html).
+The aim of this application is to be used on Cobalt browser which [only support a subset of HTML tags](https://cobalt.dev/development/reference/supported-features.html).
 
-This repository https://github.com/GuillaumeSmaha/youtube-webos-cobalt-browser provided a way to inject this application into the official Youtube App.
+This repository https://github.com/GuillaumeSmaha/youtube-webos-cobalt-browser provided a way to inject this web application into the official Youtube App.
 
 
 ## Presentation
