@@ -4,3 +4,4 @@ dist
 !dist/*.html
 !dist/*.js
 !dist/*.css
+.DS_Store
