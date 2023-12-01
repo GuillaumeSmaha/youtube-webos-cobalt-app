@@ -1,9 +1,20 @@
-# youtube-webos
+# youtube-webos-cobalt-app
+
+## Fork
+
+This application is a rework of https://github.com/webosbrew/youtube-webos to only use `div` tag.
+
+The aim of this application is to used on Cobalt which [only support a subset of HTML tags](https://cobalt.dev/development/reference/supported-features.html).
+
+This repository https://github.com/GuillaumeSmaha/youtube-webos-cobalt-browser provided a way to inject this application into the official Youtube App.
+
+
+## Presentation
 
 YouTube App with extended functionalities
 
-![Configuration Screen](https://github.com/webosbrew/youtube-webos/blob/main/screenshots/1_sm.jpg?raw=true)
-![Segment Skipped](https://github.com/webosbrew/youtube-webos/blob/main/screenshots/2_sm.jpg?raw=true)
+![Configuration Screen](./screenshots/1_sm.jpg)
+![Segment Skipped](./screenshots/2_sm.jpg)
 
 ## Features
 
@@ -29,6 +40,8 @@ YouTube App with extended functionalities
 
 Configuration screen can be opened by pressing 🟩 GREEN button on the remote.
 
+On a computer browser, char key `=` can be used on open it.
+
 ### Autostart
 
 In order to autostart an application the following command needs to be executed
@@ -52,23 +65,32 @@ In order to disable autostart run this:
 luna-send -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.leanback.v4"}'
 ```
 
+
 ## Building
 
 - Clone the repository
 
 ```sh
-git clone https://github.com/webosbrew/youtube-webos.git
+git clone https://github.com/GuillaumeSmaha/youtube-webos-cobalt-app.git
 ```
 
-- Enter the folder and build the App, this will generate a `*.ipk` file.
+- Enter the folder and build the App, this will generate the `*.css` and `*.js` files in `output` directory.
 
 ```sh
-cd youtube-webos
+cd youtube-webos-cobalt-app
 
 # Install dependencies (need to do this only when updating local repository / package.json is changed)
 npm install
 
 npm run build && npm run package
+```
+
+### Production build
+
+When providing a change on a pull request, build the `*.css` and `*.js` files with the following command:
+
+```sh
+npm run buildprod && npm run package
 ```
 
 ## Development TV setup

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
+    "buildprod": "webpack --env production --optimization-minimize",
     "watch": "webpack --watch",
     "package": "ares-package -n dist",
     "deploy": "node tools/deploy.mjs",
@@ -15,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webosbrew/youtube-webos.git"
+    "url": "git+https://github.com/GuillaumeSmaha/youtube-webos-cobalt-app.git"
   },
   "author": "",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/webosbrew/youtube-webos/issues"
+    "url": "https://github.com/GuillaumeSmaha/youtube-webos-cobalt-app/issues"
   },
-  "homepage": "https://github.com/webosbrew/youtube-webos#readme",
+  "homepage": "https://github.com/GuillaumeSmaha/youtube-webos-cobalt-app#readme",
   "dependencies": {
     "@babel/runtime": "^7.16.7",
     "@webcomponents/webcomponentsjs": "^2.6.0",

@@ -21,10 +21,13 @@ module.exports = (env) => [
 
     entry: {
       index: './src/index.js',
-      adblockMain: './src/adblock-main.js'
+      adblockMain: './src/userScript.js',
+      userScript: './src/userScript.js'
     },
     output: {
-      path: path.resolve(__dirname, './output')
+      path: path.resolve(__dirname, './dist'),
+      filename: ({ chunk: { name } }) =>
+        name === 'userScript' ? 'webOSUserScripts/[name].js' : '[name].js'
     },
     resolve: {
       extensions: ['.ts', '.js']
@@ -60,6 +63,7 @@ module.exports = (env) => [
       }),
       new CopyPlugin({
         patterns: [
+          { context: 'assets', from: '**/*' },
           { context: 'src', from: 'index.html' }
         ]
       })
