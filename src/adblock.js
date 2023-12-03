@@ -2,7 +2,7 @@
 /* global fetch:writable */
 import { configRead } from './config';
 
-export function userScriptStartAdBlock() {}
+export function userScriptStartAdBlock() {
 
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
@@ -68,4 +68,6 @@ function removeAdSlotRenderer(sectionListRenderer) {
       (elm) => !elm.adSlotRenderer
     );
   });
+}
+
 }
